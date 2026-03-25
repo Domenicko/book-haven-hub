@@ -8,6 +8,7 @@ interface BookCardBook {
   author: string;
   year?: number;
   cover?: string;
+  coverId?: number;
 }
 
 interface BookCardProps {
@@ -16,13 +17,19 @@ interface BookCardProps {
 }
 
 export default function BookCard({ book, index }: BookCardProps) {
+  const workId = book.id.replace("/works/", "");
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(index * 0.03, 0.5), duration: 0.4 }}
     >
-      <div className="group block rounded-lg border border-border bg-card overflow-hidden transition-shadow hover:shadow-lg hover:shadow-primary/5">
+      <Link
+        to={`/book/${workId}`}
+        state={{ author: book.author, coverId: book.coverId, year: book.year }}
+        className="group block rounded-lg border border-border bg-card overflow-hidden transition-shadow hover:shadow-lg hover:shadow-primary/5"
+      >
         <div className="aspect-[2/3] overflow-hidden bg-muted flex items-center justify-center">
           {book.cover ? (
             <img
@@ -44,7 +51,7 @@ export default function BookCard({ book, index }: BookCardProps) {
             <p className="text-xs text-muted-foreground/70 font-body">{book.year}</p>
           )}
         </div>
-      </div>
+      </Link>
     </motion.div>
   );
 }
