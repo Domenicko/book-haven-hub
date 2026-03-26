@@ -205,30 +205,41 @@ export default function BookDetail() {
 
       {/* Buy Book Modal */}
       <Dialog open={buyOpen} onOpenChange={setBuyOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md backdrop-blur-sm">
           <DialogHeader>
-            <DialogTitle className="font-display">Buy "{work?.title}"</DialogTitle>
+            <DialogTitle className="font-display text-xl">Buy "{work?.title}"</DialogTitle>
             <DialogDescription className="font-body">
               Fill in your details to place an order.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleBuySubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="buy-name" className="font-body">Full Name</Label>
-              <Input id="buy-name" placeholder="Jane Doe" required />
+          <form onSubmit={handleBuySubmit} className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="buy-name" className="font-body text-sm">Full Name</Label>
+              <Input id="buy-name" name="name" placeholder="Jane Doe" required />
+              {formErrors.name && <p className="text-xs text-destructive font-body">{formErrors.name}</p>}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="buy-email" className="font-body">Email</Label>
-              <Input id="buy-email" type="email" placeholder="jane@example.com" required />
+            <div className="space-y-1.5">
+              <Label htmlFor="buy-email" className="font-body text-sm">Email</Label>
+              <Input id="buy-email" name="email" type="email" placeholder="jane@example.com" required />
+              {formErrors.email && <p className="text-xs text-destructive font-body">{formErrors.email}</p>}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="buy-address" className="font-body">Shipping Address</Label>
-              <Input id="buy-address" placeholder="123 Main St, City" required />
+            <div className="space-y-1.5">
+              <Label htmlFor="buy-phone" className="font-body text-sm">Phone Number</Label>
+              <Input id="buy-phone" name="phone" type="tel" placeholder="+1 (555) 123-4567" required />
+              {formErrors.phone && <p className="text-xs text-destructive font-body">{formErrors.phone}</p>}
             </div>
-            <DialogFooter>
-              <Button type="submit" className="w-full sm:w-auto">
+            <div className="space-y-1.5">
+              <Label htmlFor="buy-address" className="font-body text-sm">Address</Label>
+              <Input id="buy-address" name="address" placeholder="123 Main St, City, Country" required />
+              {formErrors.address && <p className="text-xs text-destructive font-body">{formErrors.address}</p>}
+            </div>
+            <DialogFooter className="gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={() => setBuyOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">
                 <ShoppingCart className="h-4 w-4" />
-                Place Order
+                Submit Order
               </Button>
             </DialogFooter>
           </form>
