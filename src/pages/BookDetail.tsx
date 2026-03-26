@@ -266,12 +266,21 @@ export default function BookDetail() {
               {formErrors.address && <p className="text-xs text-destructive font-body">{formErrors.address}</p>}
             </div>
             <DialogFooter className="gap-2 pt-2">
-              <Button type="button" variant="outline" onClick={() => setBuyOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setBuyOpen(false)} disabled={submitting}>
                 Cancel
               </Button>
-              <Button type="submit">
-                <ShoppingCart className="h-4 w-4" />
-                Submit Order
+              <Button type="submit" disabled={submitting}>
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Processing…
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="h-4 w-4" />
+                    Submit Order
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>
