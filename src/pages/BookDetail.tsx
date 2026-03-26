@@ -51,6 +51,7 @@ export default function BookDetail() {
   const state = location.state as { author?: string; coverId?: number; year?: number } | null;
   const [buyOpen, setBuyOpen] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
 
   const { data: work, isLoading, isError } = useQuery({
     queryKey: ["work", id],
@@ -92,8 +93,19 @@ export default function BookDetail() {
     }
 
     setFormErrors({});
-    setBuyOpen(false);
-    toast.success("Order placed!", { description: `"${work?.title}" will be on its way soon.` });
+    setSubmitting(true);
+
+    // Simulate API call (80% success rate)
+    setTimeout(() => {
+      const success = Math.random() > 0.2;
+      setSubmitting(false);
+      if (success) {
+        setBuyOpen(false);
+        toast.success("Order successful", { description: `"${work?.title}" will be on its way soon.` });
+      } else {
+        toast.error("Oops, there is a problem", { description: "Please try again." });
+      }
+    }, 1500);
   };
 
   return (
@@ -254,12 +266,21 @@ export default function BookDetail() {
               {formErrors.address && <p className="text-xs text-destructive font-body">{formErrors.address}</p>}
             </div>
             <DialogFooter className="gap-2 pt-2">
-              <Button type="button" variant="outline" onClick={() => setBuyOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setBuyOpen(false)} disabled={submitting}>
                 Cancel
               </Button>
-              <Button type="submit">
-                <ShoppingCart className="h-4 w-4" />
-                Submit Order
+              <Button type="submit" disabled={submitting}>
+                {submitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Processing…
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="h-4 w-4" />
+                    Submit Order
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>
