@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
@@ -38,40 +38,36 @@ export default function Index() {
 
   const handleGenreClick = (genre: string | null) => {
     setSelectedGenre(genre);
-    if (genre) {
-      setQuery(genre);
-    } else {
-      setQuery("");
-    }
+    setQuery(genre ?? "");
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header showSearch searchValue={query} onSearchChange={setQuery} />
 
       {/* Hero */}
-      <section className="container mx-auto px-4 pt-16 pb-12 text-center">
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-foreground leading-tight mb-4">
+      <section className="container mx-auto px-4 pt-12 sm:pt-16 pb-10 sm:pb-12 text-center">
+        <h1 className="text-3xl sm:text-4xl lg:text-6xl font-display font-bold text-foreground leading-tight mb-4">
           Discover your next<br />
           <span className="text-primary italic">great read</span>
         </h1>
-        <p className="text-lg text-muted-foreground font-body max-w-lg mx-auto mb-8">
+        <p className="text-base sm:text-lg text-muted-foreground font-body max-w-lg mx-auto mb-8">
           Search millions of books from Open Library. Find stories that move you.
         </p>
-        <div className="flex justify-center">
+        <div className="flex justify-center md:hidden">
           <SearchBar value={query} onChange={setQuery} />
         </div>
       </section>
 
       {/* Genre Quick Filters */}
-      <section className="container mx-auto px-4 pb-8">
+      <section className="container mx-auto px-4 pb-6 sm:pb-8">
         <div className="flex flex-wrap gap-2 justify-center">
           <button
             onClick={() => handleGenreClick(null)}
-            className={`px-3.5 py-1.5 rounded-full text-sm font-body font-medium transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-sm font-body font-medium transition-all duration-200 ${
               !selectedGenre
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-border"
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                : "bg-muted text-muted-foreground hover:bg-border hover:text-foreground"
             }`}
           >
             All
@@ -80,10 +76,10 @@ export default function Index() {
             <button
               key={g}
               onClick={() => handleGenreClick(selectedGenre === g ? null : g)}
-              className={`px-3.5 py-1.5 rounded-full text-sm font-body font-medium transition-colors ${
+              className={`px-3.5 py-1.5 rounded-full text-sm font-body font-medium transition-all duration-200 ${
                 selectedGenre === g
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:bg-border"
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                  : "bg-muted text-muted-foreground hover:bg-border hover:text-foreground"
               }`}
             >
               {g}
@@ -104,7 +100,7 @@ export default function Index() {
             <p className="text-sm text-muted-foreground font-body mb-6">
               {results.length} book{results.length !== 1 && "s"} found
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
               {results.map((book, i) => (
                 <BookCard
                   key={book.key}
