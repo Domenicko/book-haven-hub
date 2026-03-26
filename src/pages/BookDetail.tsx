@@ -73,6 +73,25 @@ export default function BookDetail() {
 
   const handleBuySubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const name = (form.get("name") as string).trim();
+    const email = (form.get("email") as string).trim();
+    const phone = (form.get("phone") as string).trim();
+    const address = (form.get("address") as string).trim();
+    const errors: Record<string, string> = {};
+
+    if (!name) errors.name = "Name is required";
+    if (!email) errors.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "Enter a valid email";
+    if (!phone) errors.phone = "Phone number is required";
+    if (!address) errors.address = "Address is required";
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    setFormErrors({});
     setBuyOpen(false);
     toast.success("Order placed!", { description: `"${work?.title}" will be on its way soon.` });
   };
