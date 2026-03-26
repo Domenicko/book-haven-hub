@@ -50,6 +50,7 @@ export default function BookDetail() {
   const location = useLocation();
   const state = location.state as { author?: string; coverId?: number; year?: number } | null;
   const [buyOpen, setBuyOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const { data: work, isLoading, isError } = useQuery({
     queryKey: ["work", id],
