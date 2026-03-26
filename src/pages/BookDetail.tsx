@@ -1,9 +1,17 @@
+import { useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { ArrowLeft, BookOpen, Loader2 } from "lucide-react";
+import { ArrowLeft, BookOpen, Loader2, ExternalLink, ShoppingCart } from "lucide-react";
 import Header from "@/components/Header";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 interface WorkData {
   title: string;
@@ -18,6 +26,20 @@ async function fetchWork(workId: string): Promise<WorkData> {
   return res.json();
 }
 
+async function fetchReadLink(workId: string): Promise<string | null> {
+  try {
+    const res = await fetch(`https://openlibrary.org/works/${workId}/editions.json?limit=5`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    for (const entry of data.entries ?? []) {
+      if (entry.ocaid) return `https://archive.org/details/${entry.ocaid}`;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 function getDescription(desc?: string | { value: string }): string | null {
   if (!desc) return null;
   return typeof desc === "string" ? desc : desc.value;
@@ -27,10 +49,17 @@ export default function BookDetail() {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const state = location.state as { author?: string; coverId?: number; year?: number } | null;
+  const [buyOpen, setBuyOpen] = useState(false);
 
   const { data: work, isLoading, isError } = useQuery({
     queryKey: ["work", id],
     queryFn: () => fetchWork(id!),
+    enabled: !!id,
+  });
+
+  const { data: readLink, isLoading: readLoading } = useQuery({
+    queryKey: ["readLink", id],
+    queryFn: () => fetchReadLink(id!),
     enabled: !!id,
   });
 
@@ -40,6 +69,12 @@ export default function BookDetail() {
     : null;
   const description = work ? getDescription(work.description) : null;
   const subjects = work?.subjects?.slice(0, 8) ?? [];
+
+  const handleBuySubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setBuyOpen(false);
+    toast.success("Order placed!", { description: `"${work?.title}" will be on its way soon.` });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -115,6 +150,34 @@ export default function BookDetail() {
                 </p>
               )}
 
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3 mb-6">
+                {readLink ? (
+                  <Button asChild>
+                    <a href={readLink} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4" />
+                      Read Book
+                    </a>
+                  </Button>
+                ) : (
+                  <Button disabled={!readLoading} variant="outline">
+                    {readLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Checking…
+                      </>
+                    ) : (
+                      "Not Available Online"
+                    )}
+                  </Button>
+                )}
+
+                <Button variant="secondary" onClick={() => setBuyOpen(true)}>
+                  <ShoppingCart className="h-4 w-4" />
+                  Buy Book
+                </Button>
+              </div>
+
               {description && (
                 <p className="text-foreground/80 font-body leading-relaxed text-base mb-6 whitespace-pre-line">
                   {description}
@@ -139,6 +202,38 @@ export default function BookDetail() {
           </div>
         )}
       </div>
+
+      {/* Buy Book Modal */}
+      <Dialog open={buyOpen} onOpenChange={setBuyOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display">Buy "{work?.title}"</DialogTitle>
+            <DialogDescription className="font-body">
+              Fill in your details to place an order.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleBuySubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="buy-name" className="font-body">Full Name</Label>
+              <Input id="buy-name" placeholder="Jane Doe" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="buy-email" className="font-body">Email</Label>
+              <Input id="buy-email" type="email" placeholder="jane@example.com" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="buy-address" className="font-body">Shipping Address</Label>
+              <Input id="buy-address" placeholder="123 Main St, City" required />
+            </div>
+            <DialogFooter>
+              <Button type="submit" className="w-full sm:w-auto">
+                <ShoppingCart className="h-4 w-4" />
+                Place Order
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
