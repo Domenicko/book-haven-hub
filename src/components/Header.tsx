@@ -49,7 +49,7 @@ export default function Header({ searchValue, onSearchChange, showSearch = false
             />
           </div>
         )}
-
+        <div className="flex items-center gap-2 ml-auto">
           {/* Favorites link */}
           <Button variant="ghost" size="icon" asChild className="relative" aria-label="Favorites">
             <Link to="/favorites">
@@ -61,6 +61,7 @@ export default function Header({ searchValue, onSearchChange, showSearch = false
               )}
             </Link>
           </Button>
+
 
           {/* Mobile search toggle */}
           {showSearch && onSearchChange && (
