@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { ArrowLeft, BookOpen, Loader2, ExternalLink, ShoppingCart } from "lucide-react";
+import { ArrowLeft, BookOpen, Loader2, ExternalLink, ShoppingCart, Heart } from "lucide-react";
 import Header from "@/components/Header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useFavorites } from "@/contexts/FavoritesContext";
 
 interface WorkData {
   title: string;
@@ -52,6 +53,7 @@ export default function BookDetail() {
   const [buyOpen, setBuyOpen] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   const { data: work, isLoading, isError } = useQuery({
     queryKey: ["work", id],
@@ -71,6 +73,23 @@ export default function BookDetail() {
     : null;
   const description = work ? getDescription(work.description) : null;
   const subjects = work?.subjects?.slice(0, 8) ?? [];
+
+  const bookId = `/works/${id}`;
+  const favorited = isFavorite(bookId);
+
+  const handleToggleFavorite = () => {
+    toggleFavorite({
+      id: bookId,
+      title: work?.title ?? "Unknown",
+      author: state?.author ?? "Unknown author",
+      year: state?.year,
+      coverId,
+      cover: coverId ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg` : undefined,
+    });
+    if (!favorited) {
+      toast.success("Added to favorites");
+    }
+  };
 
   const handleBuySubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -95,7 +114,6 @@ export default function BookDetail() {
     setFormErrors({});
     setSubmitting(true);
 
-    // Simulate API call (80% success rate)
     setTimeout(() => {
       const success = Math.random() > 0.2;
       setSubmitting(false);
@@ -207,6 +225,15 @@ export default function BookDetail() {
                 <Button variant="secondary" onClick={() => setBuyOpen(true)}>
                   <ShoppingCart className="h-4 w-4" />
                   Buy Book
+                </Button>
+
+                <Button
+                  variant={favorited ? "default" : "outline"}
+                  onClick={handleToggleFavorite}
+                  className={favorited ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground" : ""}
+                >
+                  <Heart className={`h-4 w-4 ${favorited ? "fill-current" : ""}`} />
+                  {favorited ? "Favorited" : "Favorite"}
                 </Button>
               </div>
 

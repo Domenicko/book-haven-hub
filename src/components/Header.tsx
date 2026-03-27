@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { BookOpen, User, LogOut, Search, X } from "lucide-react";
+import { BookOpen, User, LogOut, Search, X, Heart } from "lucide-react";
+import { useFavorites } from "@/contexts/FavoritesContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,7 @@ interface HeaderProps {
 
 export default function Header({ searchValue, onSearchChange, showSearch = false }: HeaderProps) {
   const { user, logout } = useAuth();
+  const { favorites } = useFavorites();
   const navigate = useNavigate();
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
@@ -47,8 +49,20 @@ export default function Header({ searchValue, onSearchChange, showSearch = false
             />
           </div>
         )}
-
         <div className="flex items-center gap-2 ml-auto">
+          {/* Favorites link */}
+          <Button variant="ghost" size="icon" asChild className="relative" aria-label="Favorites">
+            <Link to="/favorites">
+              <Heart className={`h-5 w-5 ${favorites.length > 0 ? "fill-destructive text-destructive" : "text-muted-foreground"}`} />
+              {favorites.length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center">
+                  {favorites.length > 9 ? "9+" : favorites.length}
+                </span>
+              )}
+            </Link>
+          </Button>
+
+
           {/* Mobile search toggle */}
           {showSearch && onSearchChange && (
             <Button
