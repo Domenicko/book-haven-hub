@@ -4,6 +4,17 @@ import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
 import BookCard from "@/components/BookCard";
 import { Loader2 } from "lucide-react";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
+
+const PAGE_SIZE = 24;
 
 interface OpenLibraryBook {
   key: string;
@@ -13,12 +24,20 @@ interface OpenLibraryBook {
   cover_i?: number;
 }
 
-async function searchBooks(query: string): Promise<OpenLibraryBook[]> {
-  if (!query.trim()) return [];
-  const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=30`);
+interface SearchResult {
+  docs: OpenLibraryBook[];
+  numFound: number;
+}
+
+async function searchBooks(query: string, page: number): Promise<SearchResult> {
+  if (!query.trim()) return { docs: [], numFound: 0 };
+  const offset = (page - 1) * PAGE_SIZE;
+  const res = await fetch(
+    `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=${PAGE_SIZE}&offset=${offset}`
+  );
   if (!res.ok) throw new Error("Failed to fetch books");
   const data = await res.json();
-  return data.docs ?? [];
+  return { docs: data.docs ?? [], numFound: data.numFound ?? 0 };
 }
 
 const genres = ["Fiction", "Science Fiction", "Mystery", "Non-Fiction", "Self-Help", "History", "Fantasy", "Romance"];
