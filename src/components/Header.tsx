@@ -81,14 +81,14 @@ export default function Header({ searchValue, onSearchChange, showSearch = false
                 <Button variant="ghost" size="icon" className="rounded-full" aria-label="User menu">
                   <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                     <span className="text-sm font-display font-bold text-primary">
-                      {user.name.charAt(0).toUpperCase()}
+                      {(profile?.display_name ?? user.email ?? "U").charAt(0).toUpperCase()}
                     </span>
                   </div>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <div className="px-3 py-2">
-                  <p className="text-sm font-body font-medium text-foreground">{user.name}</p>
+                  <p className="text-sm font-body font-medium text-foreground">{profile?.display_name ?? "User"}</p>
                   <p className="text-xs font-body text-muted-foreground">{user.email}</p>
                 </div>
                 <DropdownMenuSeparator />
