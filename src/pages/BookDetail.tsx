@@ -172,7 +172,7 @@ export default function BookDetail() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <BookOpen className="h-16 w-16 text-muted-foreground/30" />
+                  <img src="/placeholder.svg" alt="No cover available" className="h-20 w-20 opacity-30" />
                 )}
               </div>
             </motion.div>
