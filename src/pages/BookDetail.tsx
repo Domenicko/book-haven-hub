@@ -237,11 +237,9 @@ export default function BookDetail() {
                 </Button>
               </div>
 
-              {description && (
-                <p className="text-foreground/80 font-body leading-relaxed text-base mb-6 whitespace-pre-line">
-                  {description}
-                </p>
-              )}
+              <p className="text-foreground/80 font-body leading-relaxed text-base mb-6 whitespace-pre-line">
+                {description || "No description available."}
+              </p>
 
               {subjects.length > 0 && (
                 <div>

@@ -48,7 +48,11 @@ export default function BookCard({ book, index }: BookCardProps) {
               loading="lazy"
             />
           ) : (
-            <BookOpen className="h-10 w-10 text-muted-foreground/40 transition-colors group-hover:text-primary/40" />
+            <img
+              src="/placeholder.svg"
+              alt="No cover available"
+              className="h-16 w-16 opacity-40 transition-opacity group-hover:opacity-60"
+            />
           )}
           <button
             onClick={handleFavorite}
