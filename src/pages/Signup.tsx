@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 export default function Signup() {
   const { user, signup, isLoading } = useAuth();
@@ -13,8 +14,9 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  if (user) return <Navigate to="/" replace />;
+  if (!isLoading && user) return <Navigate to="/" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,16 +25,18 @@ export default function Signup() {
       setError("Please fill in all fields");
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Please enter a valid email");
-      return;
-    }
     if (password.length < 6) {
       setError("Password must be at least 6 characters");
       return;
     }
-    const ok = await signup(email, password, name);
-    if (!ok) setError("Could not create account");
+    setSubmitting(true);
+    const errMsg = await signup(email, password, name);
+    setSubmitting(false);
+    if (errMsg) {
+      setError(errMsg);
+    } else {
+      toast.success("Account created! Check your email to confirm your account.");
+    }
   };
 
   return (
@@ -108,8 +112,8 @@ export default function Signup() {
                 />
               </div>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
+            <Button type="submit" className="w-full" disabled={submitting}>
+              {submitting ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Creating account…

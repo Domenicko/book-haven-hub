@@ -20,7 +20,7 @@ interface HeaderProps {
 }
 
 export default function Header({ searchValue, onSearchChange, showSearch = false }: HeaderProps) {
-  const { user, logout } = useAuth();
+  const { user, profile, logout } = useAuth();
   const { favorites } = useFavorites();
   const navigate = useNavigate();
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);

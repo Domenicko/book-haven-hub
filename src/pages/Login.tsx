@@ -12,8 +12,9 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  if (user) return <Navigate to="/" replace />;
+  if (!isLoading && user) return <Navigate to="/" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,12 +23,10 @@ export default function Login() {
       setError("Please fill in all fields");
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Please enter a valid email");
-      return;
-    }
-    const ok = await login(email, password);
-    if (!ok) setError("Invalid credentials");
+    setSubmitting(true);
+    const errMsg = await login(email, password);
+    setSubmitting(false);
+    if (errMsg) setError(errMsg);
   };
 
   return (
@@ -89,8 +88,8 @@ export default function Login() {
                 />
               </div>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
+            <Button type="submit" className="w-full" disabled={submitting}>
+              {submitting ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Signing in…
