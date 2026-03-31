@@ -172,7 +172,7 @@ export default function BookDetail() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <BookOpen className="h-16 w-16 text-muted-foreground/30" />
+                  <img src="/placeholder.svg" alt="No cover available" className="h-20 w-20 opacity-30" />
                 )}
               </div>
             </motion.div>
@@ -237,11 +237,9 @@ export default function BookDetail() {
                 </Button>
               </div>
 
-              {description && (
-                <p className="text-foreground/80 font-body leading-relaxed text-base mb-6 whitespace-pre-line">
-                  {description}
-                </p>
-              )}
+              <p className="text-foreground/80 font-body leading-relaxed text-base mb-6 whitespace-pre-line">
+                {description || "No description available."}
+              </p>
 
               {subjects.length > 0 && (
                 <div>
