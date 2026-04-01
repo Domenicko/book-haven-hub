@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
 import BookCard from "@/components/BookCard";
-import { Loader2 } from "lucide-react";
+import BookCardSkeleton from "@/components/BookCardSkeleton";
+import { useDebounce } from "@/hooks/use-debounce";
 import {
   Pagination,
   PaginationContent,
