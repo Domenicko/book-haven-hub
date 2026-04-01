@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { ArrowLeft, BookOpen, Loader2, ExternalLink, ShoppingCart, Heart } from "lucide-react";
@@ -54,7 +56,7 @@ export default function BookDetail() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const { isFavorite, toggleFavorite } = useFavorites();
-
+  const { user } = useAuth();
   const { data: work, isLoading, isError } = useQuery({
     queryKey: ["work", id],
     queryFn: () => fetchWork(id!),
@@ -91,7 +93,7 @@ export default function BookDetail() {
     }
   };
 
-  const handleBuySubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleBuySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const name = (form.get("name") as string).trim();
@@ -114,16 +116,26 @@ export default function BookDetail() {
     setFormErrors({});
     setSubmitting(true);
 
-    setTimeout(() => {
-      const success = Math.random() > 0.2;
+    try {
+      const { error } = await supabase.from("orders").insert({
+        user_id: user!.id,
+        book_title: work?.title ?? "Unknown",
+        book_id: id ?? "",
+        full_name: name,
+        email,
+        phone,
+        address,
+      });
+
       setSubmitting(false);
-      if (success) {
-        setBuyOpen(false);
-        toast.success("Order successful", { description: `"${work?.title}" will be on its way soon.` });
-      } else {
-        toast.error("Oops, there is a problem", { description: "Please try again." });
-      }
-    }, 1500);
+      if (error) throw error;
+
+      setBuyOpen(false);
+      toast.success("Order successful", { description: `"${work?.title}" will be on its way soon.` });
+    } catch (err: any) {
+      setSubmitting(false);
+      toast.error("Oops, there is a problem", { description: err?.message ?? "Please try again." });
+    }
   };
 
   return (

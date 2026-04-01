@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      orders: {
+        Row: {
+          address: string
+          book_id: string
+          book_title: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          phone: string
+          user_id: string
+        }
+        Insert: {
+          address: string
+          book_id: string
+          book_title: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          phone: string
+          user_id: string
+        }
+        Update: {
+          address?: string
+          book_id?: string
+          book_title?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          phone?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
