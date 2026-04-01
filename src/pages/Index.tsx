@@ -48,11 +48,14 @@ export default function Index() {
   const [page, setPage] = useState(1);
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
 
+  const debouncedQuery = useDebounce(query, 300);
+
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["books", query, page],
-    queryFn: () => searchBooks(query, page),
-    enabled: query.trim().length > 0,
+    queryKey: ["books", debouncedQuery, page],
+    queryFn: () => searchBooks(debouncedQuery, page),
+    enabled: debouncedQuery.trim().length > 0,
     staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
   });
 
   const books = data?.docs ?? [];
