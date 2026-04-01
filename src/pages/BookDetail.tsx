@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useParams, useLocation, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { ArrowLeft, BookOpen, Loader2, ExternalLink, ShoppingCart, Heart } from "lucide-react";
