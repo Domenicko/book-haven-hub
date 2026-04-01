@@ -116,16 +116,26 @@ export default function BookDetail() {
     setFormErrors({});
     setSubmitting(true);
 
-    setTimeout(() => {
-      const success = Math.random() > 0.2;
+    try {
+      const { error } = await supabase.from("orders").insert({
+        user_id: user!.id,
+        book_title: work?.title ?? "Unknown",
+        book_id: id ?? "",
+        full_name: name,
+        email,
+        phone,
+        address,
+      });
+
       setSubmitting(false);
-      if (success) {
-        setBuyOpen(false);
-        toast.success("Order successful", { description: `"${work?.title}" will be on its way soon.` });
-      } else {
-        toast.error("Oops, there is a problem", { description: "Please try again." });
-      }
-    }, 1500);
+      if (error) throw error;
+
+      setBuyOpen(false);
+      toast.success("Order successful", { description: `"${work?.title}" will be on its way soon.` });
+    } catch (err: any) {
+      setSubmitting(false);
+      toast.error("Oops, there is a problem", { description: err?.message ?? "Please try again." });
+    }
   };
 
   return (
