@@ -138,9 +138,10 @@ export default function Index() {
       {/* Results */}
       <section className="container mx-auto px-4 pb-20">
         {isLoading || isFetching ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-muted-foreground font-body">Searching books...</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <BookCardSkeleton key={i} />
+            ))}
           </div>
         ) : searchActive && books.length > 0 ? (
           <>
