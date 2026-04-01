@@ -56,7 +56,7 @@ export default function BookDetail() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const { isFavorite, toggleFavorite } = useFavorites();
-
+  const { user } = useAuth();
   const { data: work, isLoading, isError } = useQuery({
     queryKey: ["work", id],
     queryFn: () => fetchWork(id!),
