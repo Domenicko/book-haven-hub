@@ -93,7 +93,7 @@ export default function BookDetail() {
     }
   };
 
-  const handleBuySubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleBuySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const name = (form.get("name") as string).trim();
