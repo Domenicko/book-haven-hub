@@ -95,6 +95,12 @@ export default function BookDetail() {
 
   const handleBuySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!user) {
+      toast.error("Authentication required", { description: "Please log in to place an order." });
+      return;
+    }
+
     const form = new FormData(e.currentTarget);
     const name = (form.get("name") as string).trim();
     const email = (form.get("email") as string).trim();
@@ -103,10 +109,17 @@ export default function BookDetail() {
     const errors: Record<string, string> = {};
 
     if (!name) errors.name = "Name is required";
+    else if (name.length > 200) errors.name = "Name is too long";
+
     if (!email) errors.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "Enter a valid email";
+    else if (email.length > 255) errors.email = "Email is too long";
+
     if (!phone) errors.phone = "Phone number is required";
+    else if (!/^[+\d\s()-]{7,20}$/.test(phone)) errors.phone = "Enter a valid phone number";
+
     if (!address) errors.address = "Address is required";
+    else if (address.length > 500) errors.address = "Address is too long";
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -118,7 +131,7 @@ export default function BookDetail() {
 
     try {
       const { error } = await supabase.from("orders").insert({
-        user_id: user!.id,
+        user_id: user.id,
         book_title: work?.title ?? "Unknown",
         book_id: id ?? "",
         full_name: name,
@@ -127,14 +140,23 @@ export default function BookDetail() {
         address,
       });
 
-      setSubmitting(false);
-      if (error) throw error;
+      if (error) {
+        if (error.code === "23505") {
+          throw new Error("This order has already been placed.");
+        }
+        if (error.code === "42501") {
+          throw new Error("Permission denied. Please log in again.");
+        }
+        throw new Error(error.message);
+      }
 
       setBuyOpen(false);
       toast.success("Order successful", { description: `"${work?.title}" will be on its way soon.` });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "An unexpected error occurred. Please try again.";
+      toast.error("Order failed", { description: message });
+    } finally {
       setSubmitting(false);
-      toast.error("Oops, there is a problem", { description: err?.message ?? "Please try again." });
     }
   };
 
