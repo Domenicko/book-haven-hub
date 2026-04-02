@@ -30,12 +30,23 @@ interface SearchResult {
   numFound: number;
 }
 
-async function searchBooks(query: string, page: number): Promise<SearchResult> {
-  if (!query.trim()) return { docs: [], numFound: 0 };
+async function searchBooks(query: string, page: number, genre: string | null): Promise<SearchResult> {
   const offset = (page - 1) * PAGE_SIZE;
-  const res = await fetch(
-    `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=${PAGE_SIZE}&offset=${offset}`
-  );
+  let url: string;
+
+  if (query.trim()) {
+    // User typed a search query — optionally scoped to a genre/subject
+    const subjectFilter = genre ? `+subject:${encodeURIComponent(genre.toLowerCase())}` : "";
+    url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}${subjectFilter}&limit=${PAGE_SIZE}&offset=${offset}`;
+  } else if (genre) {
+    // No search query but a genre is selected — browse by subject
+    url = `https://openlibrary.org/search.json?subject=${encodeURIComponent(genre.toLowerCase())}&limit=${PAGE_SIZE}&offset=${offset}`;
+  } else {
+    // "All" with no query — show trending books
+    url = `https://openlibrary.org/search.json?q=subject:(fiction OR mystery OR fantasy OR romance)&sort=rating&limit=${PAGE_SIZE}&offset=${offset}`;
+  }
+
+  const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch books");
   const data = await res.json();
   return { docs: data.docs ?? [], numFound: data.numFound ?? 0 };
