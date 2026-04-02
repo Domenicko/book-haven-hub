@@ -92,6 +92,10 @@ export default function Header({ searchValue, onSearchChange, showSearch = false
                   <p className="text-xs font-body text-muted-foreground">{user.email}</p>
                 </div>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/orders")} className="font-body">
+                  <PackageOpen className="h-4 w-4 mr-2" />
+                  My Orders
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => { logout(); navigate("/"); }} className="font-body">
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign out
