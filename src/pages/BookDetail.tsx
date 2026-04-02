@@ -244,11 +244,11 @@ export default function BookDetail() {
                     </a>
                   </Button>
                 ) : (
-                  <Button disabled={!readLoading} variant="outline">
+                  <Button disabled variant="outline">
                     {readLoading ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Checking…
+                        Checking availability…
                       </>
                     ) : (
                       "Not Available Online"
