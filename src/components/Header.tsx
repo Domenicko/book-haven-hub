@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { BookOpen, User, LogOut, Search, X, Heart } from "lucide-react";
+import { BookOpen, User, LogOut, Search, X, Heart, PackageOpen } from "lucide-react";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
