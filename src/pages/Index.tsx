@@ -61,11 +61,12 @@ export default function Index() {
 
   const effectiveQuery = useDebounce(query, 300);
 
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, isError, refetch } = useQuery({
     queryKey: ["books", effectiveQuery, selectedGenre, page],
     queryFn: () => searchBooks(effectiveQuery, page, selectedGenre),
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
+    retry: 2,
   });
 
   const books = data?.docs ?? [];
@@ -145,7 +146,20 @@ export default function Index() {
 
       {/* Results */}
       <section className="container mx-auto px-4 pb-20">
-        {isLoading || isFetching ? (
+        {isError ? (
+          <div className="text-center py-20">
+            <p className="text-xl font-display text-foreground mb-2">Something went wrong</p>
+            <p className="text-muted-foreground font-body mb-6">
+              We couldn't load the books. Please check your connection and try again.
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="px-5 py-2 rounded-lg bg-primary text-primary-foreground font-body font-medium text-sm hover:bg-primary/90 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : isLoading || isFetching ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
             {Array.from({ length: 12 }).map((_, i) => (
               <BookCardSkeleton key={i} />
@@ -162,7 +176,7 @@ export default function Index() {
                   key={book.key}
                   book={{
                     id: book.key,
-                    title: book.title,
+                    title: book.title ?? "Untitled",
                     author: book.author_name?.[0] ?? "Unknown author",
                     year: book.first_publish_year,
                     coverId: book.cover_i,

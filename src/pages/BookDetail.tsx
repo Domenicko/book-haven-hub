@@ -222,9 +222,9 @@ export default function BookDetail() {
                 {work.title}
               </h1>
 
-              {state?.author && (
+              {(state?.author || "Unknown author") && (
                 <p className="text-lg text-muted-foreground font-body mb-1">
-                  by {state.author}
+                  by {state?.author || "Unknown author"}
                 </p>
               )}
 
@@ -244,11 +244,11 @@ export default function BookDetail() {
                     </a>
                   </Button>
                 ) : (
-                  <Button disabled={!readLoading} variant="outline">
+                  <Button disabled variant="outline">
                     {readLoading ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Checking…
+                        Checking availability…
                       </>
                     ) : (
                       "Not Available Online"
