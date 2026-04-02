@@ -30,12 +30,23 @@ interface SearchResult {
   numFound: number;
 }
 
-async function searchBooks(query: string, page: number): Promise<SearchResult> {
-  if (!query.trim()) return { docs: [], numFound: 0 };
+async function searchBooks(query: string, page: number, genre: string | null): Promise<SearchResult> {
   const offset = (page - 1) * PAGE_SIZE;
-  const res = await fetch(
-    `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=${PAGE_SIZE}&offset=${offset}`
-  );
+  let url: string;
+
+  if (query.trim()) {
+    // User typed a search query — optionally scoped to a genre/subject
+    const subjectFilter = genre ? `+subject:${encodeURIComponent(genre.toLowerCase())}` : "";
+    url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}${subjectFilter}&limit=${PAGE_SIZE}&offset=${offset}`;
+  } else if (genre) {
+    // No search query but a genre is selected — browse by subject
+    url = `https://openlibrary.org/search.json?subject=${encodeURIComponent(genre.toLowerCase())}&limit=${PAGE_SIZE}&offset=${offset}`;
+  } else {
+    // "All" with no query — show trending books
+    url = `https://openlibrary.org/search.json?q=subject:(fiction OR mystery OR fantasy OR romance)&sort=rating&limit=${PAGE_SIZE}&offset=${offset}`;
+  }
+
+  const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch books");
   const data = await res.json();
   return { docs: data.docs ?? [], numFound: data.numFound ?? 0 };
@@ -48,12 +59,11 @@ export default function Index() {
   const [page, setPage] = useState(1);
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
 
-  const debouncedQuery = useDebounce(query, 300);
+  const effectiveQuery = useDebounce(query, 300);
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["books", debouncedQuery, page],
-    queryFn: () => searchBooks(debouncedQuery, page),
-    enabled: debouncedQuery.trim().length > 0,
+    queryKey: ["books", effectiveQuery, selectedGenre, page],
+    queryFn: () => searchBooks(effectiveQuery, page, selectedGenre),
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
   });
@@ -61,11 +71,9 @@ export default function Index() {
   const books = data?.docs ?? [];
   const totalResults = data?.numFound ?? 0;
   const totalPages = Math.min(Math.ceil(totalResults / PAGE_SIZE), 50);
-  const searchActive = query.trim().length > 0;
 
   const handleGenreClick = (genre: string | null) => {
     setSelectedGenre(genre);
-    setQuery(genre ?? "");
     setPage(1);
   };
 
@@ -143,7 +151,7 @@ export default function Index() {
               <BookCardSkeleton key={i} />
             ))}
           </div>
-        ) : searchActive && books.length > 0 ? (
+        ) : books.length > 0 ? (
           <>
             <p className="text-sm text-muted-foreground font-body mb-6">
               {totalResults.toLocaleString()} book{totalResults !== 1 && "s"} found — page {page} of {totalPages}
@@ -204,18 +212,11 @@ export default function Index() {
               </Pagination>
             )}
           </>
-        ) : searchActive && books.length === 0 ? (
+        ) : (
           <div className="text-center py-20">
             <p className="text-xl font-display text-foreground mb-2">No books found</p>
             <p className="text-muted-foreground font-body">
               Try a different search term or genre.
-            </p>
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <p className="text-xl font-display text-foreground mb-2">Start searching</p>
-            <p className="text-muted-foreground font-body">
-              Type a title, author, or keyword above to explore millions of books.
             </p>
           </div>
         )}
