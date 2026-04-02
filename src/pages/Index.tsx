@@ -151,7 +151,7 @@ export default function Index() {
               <BookCardSkeleton key={i} />
             ))}
           </div>
-        ) : searchActive && books.length > 0 ? (
+        ) : books.length > 0 ? (
           <>
             <p className="text-sm text-muted-foreground font-body mb-6">
               {totalResults.toLocaleString()} book{totalResults !== 1 && "s"} found — page {page} of {totalPages}
@@ -212,18 +212,11 @@ export default function Index() {
               </Pagination>
             )}
           </>
-        ) : searchActive && books.length === 0 ? (
+        ) : (
           <div className="text-center py-20">
             <p className="text-xl font-display text-foreground mb-2">No books found</p>
             <p className="text-muted-foreground font-body">
               Try a different search term or genre.
-            </p>
-          </div>
-        ) : (
-          <div className="text-center py-20">
-            <p className="text-xl font-display text-foreground mb-2">Start searching</p>
-            <p className="text-muted-foreground font-body">
-              Type a title, author, or keyword above to explore millions of books.
             </p>
           </div>
         )}
