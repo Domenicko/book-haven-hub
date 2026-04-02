@@ -234,6 +234,7 @@ export default function Index() {
             </p>
           </div>
         )}
+      </section>
     </div>
   );
 }
