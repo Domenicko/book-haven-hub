@@ -61,11 +61,12 @@ export default function Index() {
 
   const effectiveQuery = useDebounce(query, 300);
 
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, isError, refetch } = useQuery({
     queryKey: ["books", effectiveQuery, selectedGenre, page],
     queryFn: () => searchBooks(effectiveQuery, page, selectedGenre),
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
+    retry: 2,
   });
 
   const books = data?.docs ?? [];
