@@ -222,9 +222,9 @@ export default function BookDetail() {
                 {work.title}
               </h1>
 
-              {state?.author && (
+              {(state?.author || "Unknown author") && (
                 <p className="text-lg text-muted-foreground font-body mb-1">
-                  by {state.author}
+                  by {state?.author || "Unknown author"}
                 </p>
               )}
 
