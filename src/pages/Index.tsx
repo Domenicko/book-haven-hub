@@ -59,12 +59,11 @@ export default function Index() {
   const [page, setPage] = useState(1);
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
 
-  const debouncedQuery = useDebounce(query, 300);
+  const effectiveQuery = useDebounce(query, 300);
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["books", debouncedQuery, page],
-    queryFn: () => searchBooks(debouncedQuery, page),
-    enabled: debouncedQuery.trim().length > 0,
+    queryKey: ["books", effectiveQuery, selectedGenre, page],
+    queryFn: () => searchBooks(effectiveQuery, page, selectedGenre),
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
   });
@@ -72,11 +71,9 @@ export default function Index() {
   const books = data?.docs ?? [];
   const totalResults = data?.numFound ?? 0;
   const totalPages = Math.min(Math.ceil(totalResults / PAGE_SIZE), 50);
-  const searchActive = query.trim().length > 0;
 
   const handleGenreClick = (genre: string | null) => {
     setSelectedGenre(genre);
-    setQuery(genre ?? "");
     setPage(1);
   };
 
